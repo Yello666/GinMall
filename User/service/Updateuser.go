@@ -2,6 +2,7 @@ package service
 
 import (
 	"User/model"
+	"User/utils"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -31,10 +32,9 @@ func UpdateUserService(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 	//1.查找原来的用户
-	str_id, ok := c.Params.Get("id")
+	str_id, ok := utils.GetUserID(c)
 	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "获取id失败"})
-		log.Error("获取id失败")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "用户信息过期，请重新登录"})
 		return
 	}
 	origin := model.Userinfo{}

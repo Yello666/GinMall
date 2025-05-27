@@ -26,6 +26,8 @@ func GetUserByID(DB *gorm.DB, str_id string) (Userinfo, error) {
 		return userInfo, nil
 	}
 }
+
+// UpdateUser 此处的origin必须存在主键id的值
 func UpdateUser(origin *Userinfo, updateFields map[string]interface{}, DB *gorm.DB) error {
 	log.WithField("func", "updateUser").Info("进入updateUser")
 
@@ -36,4 +38,21 @@ func UpdateUser(origin *Userinfo, updateFields map[string]interface{}, DB *gorm.
 	}
 	return nil
 
+}
+
+// Paginate 分页查询插件
+func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if page <= 0 {
+			page = 1
+		}
+		switch {
+		case pageSize > 100:
+			pageSize = 100
+		case pageSize <= 0:
+			pageSize = 10
+		}
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
 }

@@ -33,7 +33,11 @@ func UpdatePassword(c *gin.Context, DB *gorm.DB) {
 	//获得数据库里的密码
 	var user model.Userinfo
 	var err error
-	id, _ := c.Params.Get("id")
+	id, ok := utils.GetUserID(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "用户信息过期，请重新登录"})
+		return
+	}
 	user, err = model.GetUserByID(DB, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -45,7 +49,7 @@ func UpdatePassword(c *gin.Context, DB *gorm.DB) {
 	//校验密码
 	hash := user.PasswordHash
 	if utils.CheckPasswordHash(req.OldPsw, hash) {
-		log.Debug("用户验证成功，可以修改密码")
+		log.Info("用户验证成功，可以修改密码")
 		//将新密码哈希加密
 		hashedPsw, _ := utils.HashPassword(req.NewPsw)
 		//存储新密码

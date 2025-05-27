@@ -1,14 +1,12 @@
-package utils
+package service
 
 import (
-	"User"
-	"crypto/rand"
+	"User/model"
+	"User/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"math/big"
 	"net/http"
 )
 
@@ -21,8 +19,8 @@ type AddUserReq struct {
 	Age      *int   `json:"age" binding:"omitempty"`
 }
 
-func AddUser(c *gin.Context, DB *gorm.DB) {
-	log.WithField("func", "AddUser")
+func AddUserService(c *gin.Context, DB *gorm.DB) {
+	log.WithField("func", "AddUser").Info("进入AddUser")
 	//1.参数绑定与验证
 	var req AddUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -35,7 +33,7 @@ func AddUser(c *gin.Context, DB *gorm.DB) {
 	}
 
 	//2.密码哈希处理
-	hashedPassword, err := hashPassword(req.Password)
+	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "密码加密失败",
@@ -45,7 +43,7 @@ func AddUser(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 	//3.构建用户模型
-	user := User.Userinfo{
+	user := model.Userinfo{
 		UserName:     req.UserName,
 		Sex:          req.Sex,
 		Email:        req.Email,
@@ -57,7 +55,7 @@ func AddUser(c *gin.Context, DB *gorm.DB) {
 		user.UserName = GenerateRandomUsername()
 	}
 	// 5. 数据库存储
-	if err := DB.Create(&user).Error; err != nil {
+	if err := model.AddUser(DB, &user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "用户创建失败",
 			"error":   err.Error(),
@@ -85,25 +83,10 @@ var nameSuffixes = []string{
 	"tiger", "panda", "cat", "dog", "wolf", "fox", "lion", "bear",
 }
 
-// 生成随机的数字
-func getRandomIndex(length int) int {
-	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(length))) //返回一个【0~length-1】范围的随机数
-	if err != nil {
-		panic(err)
-	}
-	return int(nBig.Int64())
-}
-
 // 生成随机的名字
 func GenerateRandomUsername() string {
-	prefix := namePrefixes[getRandomIndex(len(namePrefixes))] //从namePrefixes切片中随机选择一个
-	suffix := nameSuffixes[getRandomIndex(len(nameSuffixes))]
-	number := getRandomIndex(10000)
+	prefix := namePrefixes[utils.GetRandomIndex(len(namePrefixes))] //从namePrefixes切片中随机选择一个
+	suffix := nameSuffixes[utils.GetRandomIndex(len(nameSuffixes))]
+	number := utils.GetRandomIndex(10000)
 	return fmt.Sprintf("%s_%s_%04d", prefix, suffix, number)
-}
-
-// 使用哈希加密存储密码
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(bytes), err
 }

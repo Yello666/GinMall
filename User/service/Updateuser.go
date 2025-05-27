@@ -1,7 +1,7 @@
-package utils
+package service
 
 import (
-	"User"
+	"User/model"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -17,8 +17,8 @@ type updateUserReq struct {
 
 //使用指针类型可以区分传入的是空字符串还是没传入值，是0还是没传入值
 
-func UpdateUser(c *gin.Context, DB *gorm.DB) {
-	log.WithField("func", "UpdateUser").Info("进入UpdateUser")
+func UpdateUserService(c *gin.Context, DB *gorm.DB) {
+	log.WithField("func", "UpdateUser").Info("进入UpdateUserService")
 	var req updateUserReq
 	var err error
 	//获取更新的参数
@@ -37,8 +37,8 @@ func UpdateUser(c *gin.Context, DB *gorm.DB) {
 		log.Error("获取id失败")
 		return
 	}
-	origin := User.Userinfo{}
-	origin, err = GetUserByID(DB, str_id)
+	origin := model.Userinfo{}
+	origin, err = model.GetUserByID(DB, str_id)
 	if err != nil {
 		log.Errorf("找不到原来的user信息:%v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -61,7 +61,7 @@ func UpdateUser(c *gin.Context, DB *gorm.DB) {
 	if req.Age != nil {
 		updateFields["age"] = *req.Age
 	}
-	err = updateUser(origin, updateFields, DB)
+	err = model.UpdateUser(&origin, updateFields, DB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "更新出错",
@@ -70,7 +70,7 @@ func UpdateUser(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 	//更新成功
-	updatedUser, err := GetUserByID(DB, str_id)
+	updatedUser, err := model.GetUserByID(DB, str_id)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "更新用户信息成功",
@@ -81,17 +81,18 @@ func UpdateUser(c *gin.Context, DB *gorm.DB) {
 		"id":        updatedUser.ID,
 	})
 
-	log.Infof("用户%v更新数据成功", str_id)
+	log.Infof("用户%v更新用户信息成功", str_id)
 
 }
-func updateUser(origin User.Userinfo, updateFields map[string]interface{}, DB *gorm.DB) error {
-	log.WithField("func", "updateUser").Info("进入updateUser")
 
-	//只进行修改操作
-	if err := DB.Model(&origin).Updates(updateFields).Error; err != nil {
-		log.Errorf("更新出错:%v", err)
-		return err
-	}
-	return nil
-
-}
+//func updateUser(origin model.Userinfo, updateFields map[string]interface{}, DB *gorm.DB) error {
+//	log.WithField("func", "updateUser").Info("进入updateUser")
+//
+//	//只进行修改操作
+//	if err := DB.Model(&origin).Updates(updateFields).Error; err != nil {
+//		log.Errorf("更新出错:%v", err)
+//		return err
+//	}
+//	return nil
+//
+//}

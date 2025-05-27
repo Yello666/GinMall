@@ -1,19 +1,18 @@
-package utils
+package service
 
 import (
-	"User"
+	"User/model"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"net/http"
-	"strconv"
 )
 
-func GetUser(c *gin.Context, DB *gorm.DB) {
+func GetUserService(c *gin.Context, DB *gorm.DB) {
 	log.WithField("func", "GetUser")
-	var userInfo User.Userinfo
+	var userInfo model.Userinfo
 	str_id, _ := c.Params.Get("id")
-	userInfo, err := GetUserByID(DB, str_id)
+	userInfo, err := model.GetUserByID(DB, str_id)
 	if err != nil {
 		//找不到id
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -34,14 +33,15 @@ func GetUser(c *gin.Context, DB *gorm.DB) {
 		log.Infof("获取用户%v信息成功", str_id)
 	}
 }
-func GetUserByID(DB *gorm.DB, str_id string) (User.Userinfo, error) {
-	log.WithField("func", "GetUserByID")
-	var userInfo User.Userinfo
-	int64ID, _ := strconv.ParseInt(str_id, 10, 64)
-	id := uint(int64ID)
-	if err := DB.Where("id=?", id).Find(&userInfo).Error; err != nil {
-		return userInfo, err
-	} else {
-		return userInfo, nil
-	}
-}
+
+//func GetUserByID(DB *gorm.DB, str_id string) (model.Userinfo, error) {
+//	log.WithField("func", "GetUserByID")
+//	var userInfo model.Userinfo
+//	int64ID, _ := strconv.ParseInt(str_id, 10, 64)
+//	id := uint(int64ID)
+//	if err := DB.Where("id=?", id).Find(&userInfo).Error; err != nil {
+//		return userInfo, err
+//	} else {
+//		return userInfo, nil
+//	}
+//}

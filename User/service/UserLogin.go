@@ -2,8 +2,10 @@ package service
 
 import (
 	"User/AuthJwt"
+	"User/config"
 	"User/model"
 	"User/utils"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -53,7 +55,13 @@ func UserLogin(c *gin.Context, DB *gorm.DB) {
 			},
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(AuthJwt.JwtSecret)
+		//通过配置读取
+		jwtCfg, err := config.GetJWTConfig()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("JWT Secret: %s\n", jwtCfg.Secret)
+		tokenString, err := token.SignedString(jwtCfg.Secret)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "生成token失败"})
 			return

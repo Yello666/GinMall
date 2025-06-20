@@ -12,9 +12,9 @@ func ClearShopList(c *gin.Context, DB *gorm.DB) {
 	log.WithField("func", "ClearShopList")
 
 	// 接收用户ID参数
-	userIDStr := c.Param("userID")
-	if userIDStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing user ID"})
+	GoodsIDStr := c.Param("GoodsID")
+	if GoodsIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing Goods ID"})
 		log.Error("Missing user ID parameter")
 		return
 	}

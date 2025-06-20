@@ -1,8 +1,7 @@
 package db
 
 import (
-	"User/config"
-	"User/model"
+	"Goods/model"
 	"fmt"
 
 	"gorm.io/driver/mysql"
@@ -20,20 +19,31 @@ var (
 //config.yaml 文件中的配置(复杂配置）
 //Viper 设置的默认值
 
-func InitMysql() error {
-	cfg, err := config.GetDatabaseConfig()
-	if err != nil {
-		return fmt.Errorf("加载配置失败: %v", err)
-	}
+// 数据库连接参数（直接硬编码，生产环境不建议这样做）
+const (
+	dbUser     = "root"      // 数据库用户名
+	dbPassword = "123456"    // 数据库密码
+	dbHost     = "localhost" // 数据库主机
+	dbPort     = 3306        // 数据库端口
+	dbName     = "goods_db"  // 数据库名称
+)
 
-	// 连接数据库（使用配置中的 DSN）
-	DB, err = gorm.Open(mysql.Open(cfg.DSN), &gorm.Config{})
+// 构建数据库DSN（连接字符串）
+func buildDSN() string {
+	return fmt.Sprintf(
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
+	)
+}
+func InitMysql() error {
+	dsn := buildDSN()
+	var err error
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return fmt.Errorf("数据库连接失败: %v", err)
 	}
-
 	// 自动迁移表结构
-	if err := DB.AutoMigrate(&model.Userinfo{}); err != nil {
+	if err := DB.AutoMigrate(&model.GoodsInfo{}); err != nil {
 		return fmt.Errorf("表结构迁移失败: %v", err)
 	}
 

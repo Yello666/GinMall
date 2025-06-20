@@ -1,0 +1,9 @@
+db:
+  user: root
+  host: 192.168.64.2
+  port: 3306
+  name: User
+jwt:
+  secret: YQ FOREVER       # JWT 签名密钥（生产环境必须为强密码）
+  expire_millis: 3600000   # 过期时间（毫秒）(1个小时）
+  issuer: gin-mall         # 签发者

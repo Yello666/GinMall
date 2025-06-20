@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	JwtSecret = []byte("YQ FOREVER") // 实际项目中应从配置文件读取
+	JwtSecret = "" // 实际项目中应从配置文件读取
 )
 
 type Claims struct {

@@ -1,9 +1,7 @@
 package router
 
 import (
-	"User/AuthCasbin"
-	"User/AuthJwt"
-	"User/handler"
+	"Goods/handler"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,30 +15,16 @@ casbin是验证这个人是否为管理员，登录之后，如果是管理员�
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	//公开接口
-	publicGroup := r.Group("/")
-	{
-		publicGroup.POST("/login", handler.Login)
-		publicGroup.POST("/register", handler.AddUser)
-	}
 	//需要JWT验证的接口
-	goodsG := r.Group("/user")
-	goodsG.Use(AuthJwt.JWTAuthMiddleware())
+	goodsG := r.Group("/goods")
+	//goodsG.Use(AuthJwt.JWTAuthMiddleware())
 	{
-		goodsG.GET("", handler.GetUser)
-		goodsG.PUT("", handler.UpdateUser)
+		goodsG.GET("", handler.GetOneGoods)
+		goodsG.PUT("", handler.UpdateGoods)
 		//注销自己的用户
-		goodsG.DELETE("", handler.DeleteUser)
-		goodsG.PUT("/Password", handler.UpdatePsw)
+		goodsG.DELETE("", handler.DeleteGoods)
 	}
-	// 需要Casbin权限控制的接口
-	adminGroup := r.Group("/admin")
-	//管理员目前可以查看所有用户，删除指定用户
-	adminGroup.Use(AuthJwt.JWTAuthMiddleware(), AuthCasbin.CasbinMiddleware())
-	{
-		adminGroup.GET("/users", handler.ListUsers)
-		adminGroup.DELETE("/users/:id", handler.DeleteAnyUser)
-	}
+
 	//consul健康检查接口
 	r.GET("/health", func(c *gin.Context) {
 		c.Status(200)

@@ -17,6 +17,7 @@ import (
 
 func main() {
 	//1.初始化casbin,数据库和日志记录器
+	fmt.Println("hello")
 	if err := Logger.InitLogger(); err != nil {
 		fmt.Printf("日志记录器初始化失败:%v\n", err)
 		return
@@ -25,11 +26,18 @@ func main() {
 	}
 	err := db.InitMysql()
 	if err != nil {
-		fmt.Printf("数据库连接失败:%v\n", err)
+		fmt.Printf("mysql数据库连接失败:%v\n", err)
 		return
 	}
 	sqlDB, _ := db.DB.DB()
 	defer sqlDB.Close()
+
+	err = db.InitRedis()
+	if err != nil {
+		fmt.Printf("redis数据库连接失败:%v\n", err)
+		return
+	}
+
 	log.Info("数据库连接成功")
 
 	//// 初始化Casbin

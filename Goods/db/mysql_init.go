@@ -21,11 +21,11 @@ var (
 
 // 数据库连接参数（直接硬编码，生产环境不建议这样做）
 const (
-	dbUser     = "root"      // 数据库用户名
-	dbPassword = "123456"    // 数据库密码
-	dbHost     = "localhost" // 数据库主机
-	dbPort     = 3306        // 数据库端口
-	dbName     = "goods_db"  // 数据库名称
+	dbUser     = "root"         // 数据库用户名
+	dbPassword = "123456"       // 数据库密码
+	dbHost     = "192.168.64.2" // 数据库主机
+	dbPort     = 3306           // 数据库端口
+	dbName     = "goods_db"     // 数据库名称
 )
 
 // 构建数据库DSN（连接字符串）
@@ -52,7 +52,6 @@ func InitMysql() error {
 	if err != nil {
 		return err
 	}
-	defer sqlDB.Close()
 
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)

@@ -19,10 +19,11 @@ func SetupRouter() *gin.Engine {
 	goodsG := r.Group("/goods")
 	//goodsG.Use(AuthJwt.JWTAuthMiddleware())
 	{
-		goodsG.GET("", handler.GetOneGoods)
-		goodsG.PUT("", handler.UpdateGoods)
-		//注销自己的用户
-		goodsG.DELETE("", handler.DeleteGoods)
+		goodsG.GET("/:id", handler.GetOneGoods)
+		goodsG.POST("", handler.AddGoods)
+		//goodsG.PUT("", handler.UpdateGoods)
+		////注销自己的用户
+		//goodsG.DELETE("", handler.DeleteGoods)
 	}
 
 	//consul健康检查接口

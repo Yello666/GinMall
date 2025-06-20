@@ -9,17 +9,18 @@ import (
 
 func GetOneGoods(c *gin.Context) {
 	log.Info("Get Goodsinfo")
-	service.GetGoodsService(c, db.DB)
+	service.GetGoodsService(c, db.DB, db.Rdb)
 }
 func AddGoods(c *gin.Context) {
 	log.Info("Goods Register")
-	service.AddGoodsService(c, db.DB)
+	service.AddGoodsService(c, db.DB, db.Rdb)
 }
-func UpdateGoods(c *gin.Context) {
-	log.Info("Goods Update Goodsinfo")
-	service.UpdateGoodsService(c, db.DB)
-}
-func DeleteGoods(c *gin.Context) {
-	log.Info("Goods Delete Goods")
-	service.DeleteGoodsService(c, db.DB)
-}
+
+//func UpdateGoods(c *gin.Context) {
+//	log.Info("Goods Update Goodsinfo")
+//	service.UpdateGoodsService(c, db.DB,db.Rdb)
+//}
+//func DeleteGoods(c *gin.Context) {
+//	log.Info("Goods Delete Goods")
+//	service.DeleteGoodsService(c, db.DB,db.Rdb)
+//}

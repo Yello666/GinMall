@@ -1,38 +1,58 @@
 package service
 
 import (
-	"Goods/model"
+	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"github.com/go-redis/redis/v8"
+
 	log "github.com/sirupsen/logrus"
+
+	"Goods/model"
+	"gorm.io/gorm"
 	"net/http"
+	"time"
 )
 
-func GetOneGoods(c *gin.Context, DB *gorm.DB) {
-	id, ok := c.Params.Get("id")
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "获取商品id失败",
+var ctx = context.Background()
+
+func GetGoodsService(c *gin.Context, db *gorm.DB, rdb *redis.Client) {
+	// 1. 获取商品ID
+	log.Info("get goods info")
+	goodsID := c.Param("id")
+	redisKey := fmt.Sprintf("goods:%s", goodsID)
+
+	// 2. 先查 Redis 缓存
+	val, err := rdb.Get(ctx, redisKey).Result()
+	if err == nil {
+		// 缓存命中
+		var cachedGoods model.GoodsInfo
+		if err = json.Unmarshal([]byte(val), &cachedGoods); err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"source": "cache",
+				"data":   cachedGoods,
+			})
+			return
+		}
+	}
+
+	// 3. 缓存未命中或反序列化失败 → 查数据库
+	var goods model.GoodsInfo
+	if goods, err = model.GetGoodsByID(db, goodsID); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "商品不存在",
 		})
-		log.Error("获取商品id失败")
 		return
 	}
-	var goods model.Goodsinfo
-	err := DB.Where("id=? AND is_deleted=?", id, false).Find(&goods).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "获取失败",
-		})
-		log.Errorf("获取失败:%v", err)
-		return
-	}
-	idstr := fmt.Sprintf("%d", goods.ID)
+
+	// 4. 写入 Redis 缓存（设置 10 分钟过期）
+	jsonVal, _ := json.Marshal(goods)
+	rdb.Set(ctx, redisKey, jsonVal, 10*time.Minute)
+
+	// 5. 返回数据
 	c.JSON(http.StatusOK, gin.H{
-		"message":   "success",
-		"id":        idstr,
-		"goodsName": goods.GoodsName,
-		"price":     goods.Price,
+		"source": "database",
+		"data":   goods,
 	})
-	log.Infof("成功获取商品%v的信息", goods.ID)
 }

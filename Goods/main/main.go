@@ -5,6 +5,7 @@ package main
 
 import (
 	"Goods/Logger"
+	"Goods/consul"
 	"Goods/db"
 	"Goods/router"
 	"fmt"
@@ -50,18 +51,18 @@ func main() {
 	log.Info("服务器初始化成功！！！")
 
 	//2.注册服务
-	////创建consul客户端
-	//consulClient, err := consul.CreateConsulClient()
-	//if err != nil {
-	//	log.Fatalf("创建consul客户端失败：%v", err)
-	//}
-	////注册服务到consul
-	//serviceID := "user-service-1"
-	//err = consul.RegisterService(consulClient, serviceID)
-	//if err != nil {
-	//	log.Fatalf("注册服务失败:%v", err)
-	//}
-	//defer consul.DeregisterService(consulClient, serviceID)
+	//创建consul客户端
+	consulClient, err := consul.CreateConsulClient()
+	if err != nil {
+		log.Fatalf("创建consul客户端失败：%v", err)
+	}
+	//注册服务到consul
+	serviceID := "goods-service-1"
+	err = consul.RegisterService(consulClient, serviceID)
+	if err != nil {
+		log.Fatalf("注册服务失败:%v", err)
+	}
+	defer consul.DeregisterService(consulClient, serviceID)
 
 	//3.设置路由器
 	r := router.SetupRouter()

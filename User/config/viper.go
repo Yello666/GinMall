@@ -42,6 +42,7 @@ func setDefaults() {
 	viper.SetDefault("db.port", 3306)
 	viper.SetDefault("db.user", "root")
 	viper.SetDefault("db.name", "User")
+	viper.SetDefault("db.password", "123456")
 	viper.SetDefault("jwt.secret", "YQ FOREVER")
 	viper.SetDefault("jwt.expire_millis", 3600000)
 	viper.SetDefault("jwt.issuer", "gin-mall")

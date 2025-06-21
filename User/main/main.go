@@ -3,6 +3,7 @@
 */
 package main
 
+//应该进入main运行go run main.go 否则加载配置会失败
 import (
 	"User/AuthCasbin"
 	"User/Logger"
@@ -30,13 +31,14 @@ func main() {
 		fmt.Printf("数据库连接失败:%v\n", err)
 		return
 	}
-	sqlDB, _ := db.DB.DB()
-	defer sqlDB.Close()
+	//不要在main函数中关闭！！！不然离开了main函数就会关闭数据库
+	//sqlDB, _ := db.DB.DB()
+	//defer sqlDB.Close()
 	log.Info("数据库连接成功")
 
 	// 初始化Casbin
 	if err := AuthCasbin.InitCasbin(); err != nil {
-		log.Printf("Casbin初始化失败: %v\n", err)
+		log.Fatalf("Casbin初始化失败: %v\n", err)
 		return
 	}
 	log.Info("Casbin初始化成功")
@@ -61,7 +63,7 @@ func main() {
 	r := router.SetupRouter()
 	//4.启动服务器
 	go func() {
-		err := r.Run(":8081")
+		err := r.Run(":8080")
 		if err != nil {
 			log.Fatalf("服务器启动失败:%v", err)
 		}
@@ -77,4 +79,6 @@ func waitForShutdown() {
 
 	<-stop
 	fmt.Println("收到sigint信号，关闭服务器！！！！")
+	sqlDB, _ := db.DB.DB()
+	defer sqlDB.Close()
 }

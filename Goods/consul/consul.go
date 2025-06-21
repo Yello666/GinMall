@@ -14,12 +14,12 @@ func CreateConsulClient() (*api.Client, error) {
 func RegisterService(client *api.Client, serviceID string) error {
 	registration := &api.AgentServiceRegistration{
 		ID:      serviceID,
-		Name:    "user-service",
-		Port:    8080,
-		Address: "192.168.64.1",
+		Name:    "goods-service",
+		Port:    8081,
+		Address: "localhost",
 		Check: &api.AgentServiceCheck{
-			HTTP:                           "http://192.168.64.1:8080/health",
-			Interval:                       "15s",
+			HTTP:                           "http://localhost:8081/health",
+			Interval:                       "30s",
 			Timeout:                        "5s",
 			DeregisterCriticalServiceAfter: "1m",
 		},
@@ -30,6 +30,6 @@ func DeregisterService(client *api.Client, serviceID string) {
 	if err := client.Agent().ServiceDeregister(serviceID); err != nil {
 		log.Fatalf("注销服务失败")
 	}
-	log.Info("注销了用户服务")
-	fmt.Println("注销了用户服务")
+	log.Info("注销了商品服务")
+	fmt.Println("注销了商品服务")
 }

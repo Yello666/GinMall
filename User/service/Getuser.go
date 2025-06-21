@@ -29,6 +29,10 @@ func GetUserService(c *gin.Context, DB *gorm.DB) {
 		return
 	} else {
 		//返回id,用户名,性别,
+		if userInfo.Age == nil {
+			age := 0
+			userInfo.Age = &age
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "success",
 			"id":        userInfo.ID,
@@ -69,8 +73,8 @@ func ListUsers(c *gin.Context, DB *gorm.DB) {
 	// 使用Select指定返回字段，避免暴露敏感信息（如Password）
 	result := DB.
 		Select("id, user_name, sex, age, email, created_at"). // 筛选字段
-		Order("id DESC").                                     // 按ID降序排列
-		Scopes(model.Paginate(page, pageSize)).               // 分页插件（见下方）
+		Order("id DESC"). // 按ID降序排列
+		Scopes(model.Paginate(page, pageSize)). // 分页插件（见下方）
 		Find(&users)
 
 	if result.Error != nil {

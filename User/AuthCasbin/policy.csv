@@ -4,3 +4,15 @@ p, user, /user, GET
 p, user, /user, PUT
 p, user, /user, DELETE
 p, user, /user/Password, PUT
+
+p, seller, /user, GET
+p, seller, /user, PUT
+p, seller, /user, DELETE
+p, seller, /user/Password, PUT
+
+p, seller, /goods/add, POST
+p, admin, /goods/add, POST
+
+p, user, /goods/:id, GET
+p, seller, /goods/:id, GET
+p, admin, /goods/:id, GET

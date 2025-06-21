@@ -1,7 +1,6 @@
 package db
 
 import (
-	"User/config"
 	"User/model"
 	"fmt"
 
@@ -21,19 +20,25 @@ var (
 //Viper 设置的默认值
 
 func InitMysql() error {
-	cfg, err := config.GetDatabaseConfig()
+	//cfg, err := config.GetDatabaseConfig()
+	//if err != nil {
+	//	fmt.Printf("加载配置失败: %v\n", err)
+	var err error
+	DB, err = gorm.Open(mysql.Open("root:123456@tcp(192.168.64.2:3306)/User?charset=utf8mb4&parseTime=True&loc=Local&timeout=5s"), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("加载配置失败: %v", err)
+		fmt.Printf("数据库连接失败1", err)
+		return fmt.Errorf("数据库连接失败1: %v", err)
 	}
-
-	// 连接数据库（使用配置中的 DSN）
-	DB, err = gorm.Open(mysql.Open(cfg.DSN), &gorm.Config{})
-	if err != nil {
-		return fmt.Errorf("数据库连接失败: %v", err)
-	}
+	//} else {
+	//	// 连接数据库（使用配置中的 DSN）
+	//	DB, err = gorm.Open(mysql.Open(cfg.DSN), &gorm.Config{})
+	//	if err != nil {
+	//		return fmt.Errorf("数据库连接失败2: %v", err)
+	//	}
+	//}
 
 	// 自动迁移表结构
-	if err := DB.AutoMigrate(&model.Userinfo{}); err != nil {
+	if err = DB.AutoMigrate(&model.Userinfo{}); err != nil {
 		return fmt.Errorf("表结构迁移失败: %v", err)
 	}
 
@@ -42,7 +47,7 @@ func InitMysql() error {
 	if err != nil {
 		return err
 	}
-	defer sqlDB.Close()
+	//defer sqlDB.Close()
 
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)

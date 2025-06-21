@@ -18,20 +18,20 @@ casbin是验证这个人是否为管理员，登录之后，如果是管理员�
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	//公开接口
-	publicGroup := r.Group("/")
+	publicGroup := r.Group("/user")
 	{
 		publicGroup.POST("/login", handler.Login)
 		publicGroup.POST("/register", handler.AddUser)
 	}
 	//需要JWT验证的接口
-	goodsG := r.Group("/user")
-	goodsG.Use(AuthJwt.JWTAuthMiddleware())
+	userG := r.Group("/user")
+	userG.Use(AuthJwt.JWTAuthMiddleware())
 	{
-		goodsG.GET("", handler.GetUser)
-		goodsG.PUT("", handler.UpdateUser)
+		userG.GET("/get", handler.GetUser)
+		userG.PUT("/update", handler.UpdateUser)
 		//注销自己的用户
-		goodsG.DELETE("", handler.DeleteUser)
-		goodsG.PUT("/Password", handler.UpdatePsw)
+		userG.DELETE("/delete", handler.DeleteUser)
+		userG.PUT("/Password", handler.UpdatePsw)
 	}
 	// 需要Casbin权限控制的接口
 	adminGroup := r.Group("/admin")
@@ -45,5 +45,8 @@ func SetupRouter() *gin.Engine {
 	r.GET("/health", func(c *gin.Context) {
 		c.Status(200)
 	})
+
+	//casbin查看权限接口
+	r.POST("/auth/check", handler.AuthCheck)
 	return r
 }

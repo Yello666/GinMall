@@ -41,3 +41,7 @@ func DeleteAnyUser(c *gin.Context) {
 	log.Info("Admin Delete user")
 
 }
+func AuthCheck(c *gin.Context) {
+	log.Info("Auth Check")
+	service.AuthCheckService(c)
+}

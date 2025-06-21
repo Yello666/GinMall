@@ -16,8 +16,8 @@ import (
 const EXPIRETIME = 7 //7天过期，登录有效期为7天，7天后需要重新登录
 type login struct {
 	UserID   string `json:"user_id" binding:"required,min=1,max=50"`
-	Password string `json:"-" binding:"required,min=6,max=20"`
-	Role     string `json:"role" binding:"required,oneof=user admin"`
+	Password string `json:"password" binding:"required,min=6,max=20"`
+	Role     string `json:"role" binding:"required,oneof=user admin seller"`
 }
 
 func UserLogin(c *gin.Context, DB *gorm.DB) {
@@ -61,7 +61,8 @@ func UserLogin(c *gin.Context, DB *gorm.DB) {
 			panic(err)
 		}
 		fmt.Printf("JWT Secret: %s\n", jwtCfg.Secret)
-		tokenString, err := token.SignedString(jwtCfg.Secret)
+		//使用string类型的jwt密钥会失败，应该使用[]byte类型
+		tokenString, err := token.SignedString([]byte(jwtCfg.Secret))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "生成token失败"})
 			return

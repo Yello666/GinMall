@@ -20,7 +20,7 @@ func SetupRouter() *gin.Engine {
 	//goodsG.Use(AuthJwt.JWTAuthMiddleware())
 	{
 		goodsG.GET("/:id", handler.GetOneGoods)
-		goodsG.POST("", handler.AddGoods)
+		goodsG.POST("/add", handler.AddGoods)
 		//goodsG.PUT("", handler.UpdateGoods)
 		////注销自己的用户
 		//goodsG.DELETE("", handler.DeleteGoods)

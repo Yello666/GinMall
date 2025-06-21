@@ -17,6 +17,7 @@ type AddUserReq struct {
 	Password string `json:"password" binding:"required,min=6,max=20" `
 	Email    string `json:"email" binding:"omitempty,email"`
 	Age      *int   `json:"age" binding:"omitempty"`
+	Role     string `json:"role" binding:"required,oneof=user admin seller"`
 }
 
 func AddUserService(c *gin.Context, DB *gorm.DB) {
@@ -48,6 +49,7 @@ func AddUserService(c *gin.Context, DB *gorm.DB) {
 		Sex:          req.Sex,
 		Email:        req.Email,
 		Age:          req.Age,
+		Role:         req.Role,
 		PasswordHash: hashedPassword,
 	}
 	//4.自动生成用户名（如果没提供）
@@ -70,6 +72,7 @@ func AddUserService(c *gin.Context, DB *gorm.DB) {
 		"user_name": user.UserName,
 		"sex":       user.Sex,
 		"age":       user.Age,
+		"role":      user.Role,
 		"email":     user.Email,
 	})
 	log.Infof("新用户注册成功 ID:%d Username:%s", user.ID, user.UserName)

@@ -3,7 +3,6 @@ package Logger
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -103,15 +102,15 @@ func (f *CustomFormatter) Format(entry *log.Entry) ([]byte, error) {
 
 // 初始化日志系统
 func InitLogger() error {
-	hook, err := NewTimeRotatingHook("./serverLogs", 24*time.Hour) // 每天一个文件
+	hook, err := NewTimeRotatingHook("../serverLogs", 24*time.Hour) // 每天一个文件
 	if err != nil {
 		return err
 	}
 
 	log.SetFormatter(&CustomFormatter{})
-	log.SetOutput(io.Discard)   // 禁用默认输出，避免重复写入
 	log.SetLevel(log.InfoLevel) // 设置日志级别
-	log.AddHook(hook)           // 注册自定义 hook
+	log.SetOutput(os.Stdout)
+	log.AddHook(hook) // 注册自定义 hook
 
 	return nil
 }
